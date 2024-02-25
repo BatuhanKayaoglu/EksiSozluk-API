@@ -17,6 +17,8 @@ namespace EksiSozluk.Api.Application.Mapping
             CreateMap<User, LoginUserViewModel>().ReverseMap();
             CreateMap<User, CreateUserCommand>().ReverseMap();
             CreateMap<User, UpdateUserCommand>().ReverseMap();
+            CreateMap<Entry, CreateEntryCommand>().ReverseMap();
+            CreateMap<EntryComment, CreateEntryCommentCommand>().ReverseMap();
         }
     }
 }
