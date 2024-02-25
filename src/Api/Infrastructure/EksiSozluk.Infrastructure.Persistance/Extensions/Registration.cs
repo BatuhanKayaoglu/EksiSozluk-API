@@ -1,4 +1,6 @@
-﻿using EksiSozluk.Infrastructure.Persistance.Context;
+﻿using EksiSozluk.Api.Application.Repositories;
+using EksiSozluk.Infrastructure.Persistance.Context;
+using EksiSozluk.Infrastructure.Persistance.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,8 +25,10 @@ namespace EksiSozluk.Infrastructure.Persistance.Extensions
 
 
             // bu kısmı sonradan ekledik seedData olusturup db'ye eklemek için.
-            var seedData = new SeedData();
-            seedData.SeedAsync(configuration).GetAwaiter().GetResult();
+            //var seedData = new SeedData();
+            //seedData.SeedAsync(configuration).GetAwaiter().GetResult();
+
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
 
