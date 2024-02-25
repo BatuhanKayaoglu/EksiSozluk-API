@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using EksiSozluk.Common.ViewModels.Queries;
+using EksiSozluk.Common.ViewModels.RequestModels;
 using EksİSozluk.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,8 @@ namespace EksiSozluk.Api.Application.Mapping
         public MappingProfile()
         {
             CreateMap<User, LoginUserViewModel>().ReverseMap();
+            CreateMap<User, CreateUserCommand>().ReverseMap();
+            CreateMap<User, UpdateUserCommand>().ReverseMap();
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EksiSozluk.Common.ViewModels.RequestModels
 {
-    // Dışarıdan alacagim bilgiler için
+    // Dışarıdan alacagim bilgiler için. (Bu parametreleri hem application hem de webApi tarafında ortak kullanacagım için Common'a ekledim.)
     public class LoginUserCommand:IRequest<LoginUserViewModel> // Dışarıya 'LoginUserViewModel' dönmek istiyorum. 
     {
         // Dışarıdan alacagım bilgiler

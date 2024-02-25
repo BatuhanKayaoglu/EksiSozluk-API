@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EksiSozluk.Api.Application.Features.Commands.User
+namespace EksiSozluk.Api.Application.Features.Commands.User.Login
 {
     // NOT: Program.cs'e 'AddFluentValidation()' eklemeyi unutma.
     public class LoginUserCommandValidator : AbstractValidator<LoginUserCommand>

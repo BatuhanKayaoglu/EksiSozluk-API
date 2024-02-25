@@ -16,7 +16,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EksiSozluk.Api.Application.Features.Commands.User
+namespace EksiSozluk.Api.Application.Features.Commands.User.Login
 {
     public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginUserViewModel>
     {
@@ -35,11 +35,11 @@ namespace EksiSozluk.Api.Application.Features.Commands.User
         {
             var dbUser = await userRepository.GetSingleAsync(i => i.EmailAddress == request.EmailAdress);
 
-            if (dbUser == null) 
+            if (dbUser == null)
             {
                 throw new DatabaseValidationException("User not found!");
             }
-            var pass=PasswordEncrypter.Encrypt(request.Password); // dışardan geleni şifreliyorum ve altta da bendeki şifrelenmiş ile aynı mı onu kontrol edicem.
+            var pass = PasswordEncrypter.Encrypt(request.Password); // dışardan geleni şifreliyorum ve altta da bendeki şifrelenmiş ile aynı mı onu kontrol edicem.
             if (dbUser.Password != pass)
                 throw new DatabaseValidationException("Password is wrong");
 
@@ -76,7 +76,7 @@ namespace EksiSozluk.Api.Application.Features.Commands.User
                                             signingCredentials: creds,
                                             notBefore: DateTime.Now);
 
-            return new JwtSecurityTokenHandler().WriteToken(token); 
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
     }
