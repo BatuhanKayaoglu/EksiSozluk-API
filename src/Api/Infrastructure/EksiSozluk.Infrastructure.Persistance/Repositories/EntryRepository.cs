@@ -1,4 +1,5 @@
 ﻿using EksiSozluk.Api.Application.Repositories;
+using EksiSozluk.Infrastructure.Persistance.Context;
 using EksİSozluk.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +12,7 @@ namespace EksiSozluk.Infrastructure.Persistance.Repositories
 {
     public class EntryRepository : GenericRepository<Entry>, IEntryRepository
     {
-        public EntryRepository(DbContext dbContext) : base(dbContext)
+        public EntryRepository(EksiSozlukContext dbContext) : base(dbContext)
         {
         }
     }

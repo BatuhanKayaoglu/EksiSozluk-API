@@ -1,4 +1,5 @@
 ﻿using EksiSozluk.Api.Application.Repositories;
+using EksiSozluk.Infrastructure.Persistance.Context;
 using EksİSozluk.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +12,7 @@ namespace EksiSozluk.Infrastructure.Persistance.Repositories
 {
     public class EntryCommentRepository : GenericRepository<EntryComment>, IEntryCommentRepository
     {
-        public EntryCommentRepository(DbContext dbContext) : base(dbContext)
+        public EntryCommentRepository(EksiSozlukContext dbContext) : base(dbContext)
         {
         }
     }
