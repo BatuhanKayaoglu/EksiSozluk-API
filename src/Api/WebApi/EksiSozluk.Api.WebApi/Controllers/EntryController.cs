@@ -1,4 +1,5 @@
-﻿using EksiSozluk.Common.ViewModels.RequestModels;
+﻿using EksiSozluk.Api.Application.Features.Queries.GetEntries;
+using EksiSozluk.Common.ViewModels.RequestModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,14 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public EntryController(IMediator mediator)
         {
             this.mediator = mediator;
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetEntries([FromQuery] GetEntriesQuery query)
+        {
+            var entries = await mediator.Send(query);
+            return Ok(entries);
         }
 
         [HttpPost]

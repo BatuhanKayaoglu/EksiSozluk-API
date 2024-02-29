@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EksiSozluk.Common.Queries;
 using EksiSozluk.Common.ViewModels.Queries;
 using EksiSozluk.Common.ViewModels.RequestModels;
 using EksİSozluk.Domain.Models;
@@ -19,6 +20,7 @@ namespace EksiSozluk.Api.Application.Mapping
             CreateMap<User, UpdateUserCommand>().ReverseMap();
             CreateMap<Entry, CreateEntryCommand>().ReverseMap();
             CreateMap<EntryComment, CreateEntryCommentCommand>().ReverseMap();
+            CreateMap<GetEnriesViewModel,Entry>().ReverseMap().ForMember(x=>x.CommentCount, y=>y.MapFrom(z=>z.EntryComments.Count));
         }
     }
 }
