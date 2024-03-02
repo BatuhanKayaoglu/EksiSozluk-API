@@ -1,4 +1,5 @@
 ﻿using EksiSozluk.Api.Application.Features.Commands.User.ConfirmEmail;
+using EksiSozluk.Api.Application.Features.Queries.GetUserDetail;
 using EksiSozluk.Common.Events.User;
 using EksiSozluk.Common.ViewModels.RequestModels;
 using MediatR;
@@ -18,6 +19,22 @@ namespace EksiSozluk.Api.WebApi.Controllers
             this.mediator = mediator;
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(Guid id)
+        {
+            var user = await mediator.Send(new GetUserDetailQuery(id));
+
+            return Ok(user);
+        }
+
+        [HttpGet]
+        [Route("UserName/{userName}")]
+        public async Task<IActionResult> GetByUserName(string userName)
+        {
+            var user = await mediator.Send(new GetUserDetailQuery(Guid.Empty, userName));
+
+            return Ok(user);
+        }
 
         [HttpPost]
         [Route("Login")]
@@ -50,7 +67,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
         [Route("ConfirmEmail")]
         public async Task<IActionResult> Confirm(Guid id)
         {
-            var res = await mediator.Send(new ConfirmEmailCommand() { ConfirmationId=id});
+            var res = await mediator.Send(new ConfirmEmailCommand() { ConfirmationId = id });
 
             return Ok(res);
         }

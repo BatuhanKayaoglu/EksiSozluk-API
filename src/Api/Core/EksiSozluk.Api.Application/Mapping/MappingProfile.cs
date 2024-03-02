@@ -19,6 +19,7 @@ namespace EksiSozluk.Api.Application.Mapping
             CreateMap<User, UpdateUserCommand>().ReverseMap();
             CreateMap<Entry, CreateEntryCommand>().ReverseMap();
             CreateMap<EntryComment, CreateEntryCommentCommand>().ReverseMap();
+            CreateMap<User, UserDetailViewModel>().ReverseMap();
             CreateMap<Entry, GetEntriesViewModel>().ForMember(x=>x.CommentCount, y=>y.MapFrom(z=>z.EntryComments.Count));
         }
     }
