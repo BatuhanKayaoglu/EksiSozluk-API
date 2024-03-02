@@ -1,4 +1,4 @@
-﻿using EksiSozluk.Common.Queries;
+﻿using EksiSozluk.Common.ViewModels.Queries;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EksiSozluk.Api.Application.Features.Queries.GetEntries
 {
-    public class GetEntriesQuery : IRequest<List<GetEnriesViewModel>>
+    public class GetEntriesQuery : IRequest<List<GetEntriesViewModel>>
     {
         public bool TodaysEntries { get; set; }
         public int Count { get; set; } = 100;

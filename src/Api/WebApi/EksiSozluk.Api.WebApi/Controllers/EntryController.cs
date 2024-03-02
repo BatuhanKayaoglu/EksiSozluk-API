@@ -1,4 +1,6 @@
 ﻿using EksiSozluk.Api.Application.Features.Queries.GetEntries;
+using EksiSozluk.Api.Application.Features.Queries.GetMainPageEntries;
+using EksiSozluk.Common.ViewModels.Queries;
 using EksiSozluk.Common.ViewModels.RequestModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +26,16 @@ namespace EksiSozluk.Api.WebApi.Controllers
             var entries = await mediator.Send(query);
             return Ok(entries);
         }
+
+        [HttpGet]
+        [Route("MainPageEntries")]
+        public async Task<IActionResult> GetMainPageEntries(int page, int pageSize)
+        {
+            var entries = await mediator.Send(new GetMainPageEntriesQuery(UserId,page,pageSize));
+            return Ok(entries);
+        }
+
+
 
         [HttpPost]
         [Route("CreateEntry")]

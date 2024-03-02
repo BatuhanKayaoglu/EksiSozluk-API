@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using EksiSozluk.Api.Application.Repositories;
-using EksiSozluk.Common.Queries;
+using EksiSozluk.Common.ViewModels.Queries;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace EksiSozluk.Api.Application.Features.Queries.GetEntries
 {
-    public class GetEntriesQueryHandler : IRequestHandler<GetEntriesQuery, List<GetEnriesViewModel>>
+    public class GetEntriesQueryHandler : IRequestHandler<GetEntriesQuery, List<GetEntriesViewModel>>
     {
         private readonly IEntryRepository entryRepository;
         private readonly IMapper mapper;
@@ -18,7 +18,7 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetEntries
             this.mapper = mapper;
         }
 
-        public async Task<List<GetEnriesViewModel>> Handle(GetEntriesQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetEntriesViewModel>> Handle(GetEntriesQuery request, CancellationToken cancellationToken)
         {
             var query = entryRepository.AsQueryable();
 
@@ -32,7 +32,7 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetEntries
                 .OrderBy(i => Guid.NewGuid()) // rastgele sıralasın diye
                 .Take(request.Count);
 
-            return await query.ProjectTo<GetEnriesViewModel>(mapper.ConfigurationProvider).ToListAsync(cancellationToken); // gidicek burdaki modele bakıcak ve içersinde hangi alanlar varsa db'de sorgu calıstırırken sadee  o alanı yazıcak ve performans kazancaz.
+            return await query.ProjectTo<GetEntriesViewModel>(mapper.ConfigurationProvider).ToListAsync(cancellationToken); // gidicek burdaki modele bakıcak ve içersinde hangi alanlar varsa db'de sorgu calıstırırken sadee  o alanı yazıcak ve performans kazancaz.
 
         }
     }
