@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EksiSozluk.Common.Queries
+namespace EksiSozluk.Common.ViewModels.Queries
 {
-    public class GetEnriesViewModel // birisi api'ye istek yaptıgında ne dönceğimizi burda belirliyoruz.
+    public class GetEntriesViewModel // birisi api'ye istek yaptıgında ne dönceğimizi burda belirliyoruz.
     {
         public Guid Id { get; set; }
         public string Subject { get; set; }

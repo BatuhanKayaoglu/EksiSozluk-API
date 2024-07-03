@@ -8,6 +8,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
     [ApiController]
     public class BaseController : ControllerBase
     {
-        public Guid UserId => new(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value); // JWT Token ile alıyoruz bunu
+        //public Guid? UserId => new(HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value); // JWT Token ile alıyoruz bunu
+        public Guid UserId => Guid.NewGuid(); // JWT Token ile alıyoruz bunu
     }
 }
