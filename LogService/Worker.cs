@@ -1,4 +1,4 @@
-namespace EksiSozluk.Projections.FavoriteService
+namespace LogService
 {
     public class Worker : BackgroundService
     {
@@ -13,8 +13,12 @@ namespace EksiSozluk.Projections.FavoriteService
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                await Task.Delay(4000, stoppingToken);
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                }
+                Console.WriteLine("BATUUUUU");
+                await Task.Delay(1000, stoppingToken);
             }
         }
     }
