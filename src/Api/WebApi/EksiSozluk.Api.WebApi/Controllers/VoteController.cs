@@ -41,7 +41,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
 
         [HttpPost]
         [Route("DeleteEntryVote/{entryId}")]
-        public async Task<IActionResult> dELETEeNTRYvOTE(Guid entryId)
+        public async Task<IActionResult> DeleteEntryVote(Guid entryId)
         {
             await mediator.Send(new DeleteEntryVoteCommand(entryId, UserId));
 

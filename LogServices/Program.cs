@@ -4,7 +4,6 @@ using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Spi;
 using Quartz.Impl;
-using Quartz.Extensions.Hosting;
 
 
 public partial class Program

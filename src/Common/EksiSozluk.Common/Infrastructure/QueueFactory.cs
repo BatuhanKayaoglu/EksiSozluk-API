@@ -2,6 +2,7 @@
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -40,7 +41,7 @@ namespace EksiSozluk.Common.Infrastructure
         public static EventingBasicConsumer CreateBasicConsumer()
         {
             var factory = new ConnectionFactory();
-            factory.Uri = new("amqps://pwayvqwa:FH59f9X2QwhP9LJjHAs4a3v8XAA-W-id@woodpecker.rmq.cloudamqp.com/pwayvqwa");
+            factory.Uri = new("amqps://xvnbchgs:Xqd-yU1RoCvt3stDRk0cPyXzXIiqxJJT@moose.rmq.cloudamqp.com/xvnbchgs");
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
 
@@ -60,5 +61,38 @@ namespace EksiSozluk.Common.Infrastructure
             consumer.Model.QueueBind(queueName, exchangeName, queueName);
             return consumer;
         }
+
+        public static EventingBasicConsumer Receive<T>(this EventingBasicConsumer consumer, Action<T> act)
+        {
+            consumer.Received += (model, ea) =>
+            {
+                var body = ea.Body.ToArray();
+                var message = Encoding.UTF8.GetString(body);
+
+                var obj = JsonSerializer.Deserialize<T>(message);
+                act(obj);
+
+                consumer.Model.BasicAck(ea.DeliveryTag, false);
+            };
+
+            return consumer;
+        }
+
+
+
+        /// <summary>
+        // Bu metod, belirtilen kuyruktan mesajların alınmasını başlatır.
+        // consumer.Model.BasicConsume kullanılarak belirtilen kuyruktan mesajlar alınmaya başlanır.
+        //autoAck: false ile manuel onaylama kullanılır, yani mesajlar işlendikten sonra elle onaylanır.
+        //Metod sonunda, değişikliklerin zincirlenebilmesi için consumer nesnesi geri döndürülür.
+        /// </summary>
+        public static EventingBasicConsumer StartingConsuming(this EventingBasicConsumer consumer, string queueName)
+        {
+            consumer.Model.BasicConsume(queue: queueName,
+                autoAck: false,
+                consumer: consumer);
+            return consumer;
+        }
+
     }
 }
