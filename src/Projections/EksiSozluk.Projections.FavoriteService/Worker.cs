@@ -1,5 +1,6 @@
 using EksiSozluk.Common;
 using EksiSozluk.Common.Events.Entry;
+using EksiSozluk.Common.Events.EntryComment;
 using EksiSozluk.Common.Infrastructure;
 
 namespace EksiSozluk.Projections.FavoriteService
@@ -31,6 +32,41 @@ namespace EksiSozluk.Projections.FavoriteService
                     // Örneðin; EntryId'si 5 olan entry'e favori eklenmiþse, EntryId'si 5 olan entry'i favori olarak db'ye eklemiþ olacagýz.       
                 })
                 .StartingConsuming(SozlukConstants.CreateEntryFavQueueName);
+
+
+            QueueFactory.CreateBasicConsumer()
+                .EnsureExchange(SozlukConstants.FavExchangeName)
+                .EnsureQueue(SozlukConstants.DeleteEntryFavQueueName, SozlukConstants.FavExchangeName)
+                .Receive<DeleteEntryFavEvent>(async (fav) =>
+                {
+                    favService.DeleteEntryFav(fav).GetAwaiter().GetResult();
+                    _logger.LogInformation($"Deleted Received {fav.EntryId} from {fav.CreatedBy}");
+                })
+                .StartingConsuming(SozlukConstants.DeleteEntryFavQueueName);
+
+
+            QueueFactory.CreateBasicConsumer()
+                .EnsureExchange(SozlukConstants.FavExchangeName)
+                .EnsureQueue(SozlukConstants.CreateEntryCommentFavQueueName, SozlukConstants.FavExchangeName)
+                .Receive<CreateEntryCommentFavEvent>(async (fav) =>
+                {
+                    favService.CreateEntryCommentFav(fav).GetAwaiter().GetResult();
+                    _logger.LogInformation($"Create Entry Comment Received EntryCommentId {fav.EntryCommentId}");
+                    // Burada gelen event'e göre iþlem yapýlacak.
+                    // Örneðin; EntryId'si 5 olan entry'e favori eklenmiþse, EntryId'si 5 olan entry'i favori olarak db'ye eklemiþ olacagýz.       
+                })
+                .StartingConsuming(SozlukConstants.CreateEntryFavQueueName);
+
+
+            QueueFactory.CreateBasicConsumer()
+                .EnsureExchange(SozlukConstants.FavExchangeName)
+                .EnsureQueue(SozlukConstants.DeleteEntryCommentFavQueueName, SozlukConstants.FavExchangeName)
+                .Receive<DeleteEntryCommentFavEvent>(async (fav) =>
+                {
+                    favService.DeleteEntryCommentFav(fav).GetAwaiter().GetResult();
+                    _logger.LogInformation($"Deleted Entry Comment  Received EntryCommentId{fav.EntryCommentId}");
+                })
+                .StartingConsuming(SozlukConstants.DeleteEntryCommentFavQueueName);
         }
     }
 }
