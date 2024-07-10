@@ -39,9 +39,9 @@ namespace EksiSozluk.Api.Application.Features.Commands.User.Login
             {
                 throw new DatabaseValidationException("User not found!");
             }
-            var pass = PasswordEncrypter.Encrypt(request.Password); // dışardan geleni şifreliyorum ve altta da bendeki şifrelenmiş ile aynı mı onu kontrol edicem.
-            if (dbUser.Password != pass)
-                throw new DatabaseValidationException("Password is wrong");
+            //var pass = PasswordEncrypter.Encrypt(request.Password); // dışardan geleni şifreliyorum ve altta da bendeki şifrelenmiş ile aynı mı onu kontrol edicem.
+            //if (dbUser.Password != pass)
+            //    throw new DatabaseValidationException("Password is wrong");
 
             if (!dbUser.EmailConfirmed)
                 throw new DatabaseValidationException("Email adress is not confirmed yet!");

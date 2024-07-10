@@ -47,8 +47,8 @@ namespace EksiSozluk.Api.Application.Features.Commands.User.Update
             {
                 var @event = new UserEmailChangedEvent()
                 {
-                    OldEmailAddress = null,
-                    NewEmailAddress = dbUser.EmailAddress
+                    OldEmailAdress = null,
+                    NewEmailAdress = dbUser.EmailAddress
                 };
 
                 QueueFactory.SendMessageToExchange(exchangeName: SozlukConstants.UserExchangeName, exchangeType: SozlukConstants.DefaultExchangeType, queueName: SozlukConstants.UserEmailChangedQueueName, obj: @event);

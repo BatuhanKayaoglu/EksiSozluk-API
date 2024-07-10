@@ -8,7 +8,7 @@ namespace EksiSozluk.Common.Events.User
 {
     public class UserEmailChangedEvent
     {
-        public string OldEmailAddress { get; set; }
-        public string NewEmailAddress { get; set; }
+        public string OldEmailAdress { get; set; }
+        public string NewEmailAdress { get; set; }
     }
 }

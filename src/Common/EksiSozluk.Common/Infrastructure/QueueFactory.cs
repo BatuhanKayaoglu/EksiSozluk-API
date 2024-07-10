@@ -69,6 +69,8 @@ namespace EksiSozluk.Common.Infrastructure
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
+                Console.WriteLine("Received message: " + message); // Gelen mesajı logla
+
                 var obj = JsonSerializer.Deserialize<T>(message);
                 act(obj);
 
