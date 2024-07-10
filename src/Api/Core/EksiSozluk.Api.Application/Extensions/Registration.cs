@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using EksiSozluk.Api.Application.Cache;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -19,7 +20,8 @@ namespace EksiSozluk.Api.Application.Extensions
             // MediatorR ve AutoMapper'in DI kütüphanalerini bu yüzden yükledik.
             services.AddMediatR(asm);
             services.AddAutoMapper(asm);    
-            services.AddValidatorsFromAssembly(asm);    
+            services.AddValidatorsFromAssembly(asm);  
+            services.AddTransient<IRedisCacheService,RedisCacheService>();  
 
             return services;    
         }

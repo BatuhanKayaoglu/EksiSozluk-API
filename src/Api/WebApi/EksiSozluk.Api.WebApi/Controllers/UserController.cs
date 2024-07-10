@@ -1,10 +1,13 @@
-﻿using EksiSozluk.Api.Application.Features.Commands.User.ConfirmEmail;
+﻿using EksiSozluk.Api.Application.Cache;
+using EksiSozluk.Api.Application.Features.Commands.User.ConfirmEmail;
 using EksiSozluk.Api.Application.Features.Queries.GetUserDetail;
 using EksiSozluk.Common.Events.User;
 using EksiSozluk.Common.ViewModels.RequestModels;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
+using StackExchange.Redis;
+using System.Text;
 
 namespace EksiSozluk.Api.WebApi.Controllers
 {
@@ -12,17 +15,24 @@ namespace EksiSozluk.Api.WebApi.Controllers
     [ApiController]
     public class UserController : BaseController
     {
-        private readonly IMediator mediator;
 
-        public UserController(IMediator mediator)
+        private readonly IMediator mediator;
+        private readonly IRedisCacheService redisCacheService;
+
+        public UserController(IMediator mediator, IRedisCacheService redisCacheService)
         {
             this.mediator = mediator;
+            this.redisCacheService = redisCacheService;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var user = await mediator.Send(new GetUserDetailQuery(id));
+
+            await redisCacheService.SetAsync(user, default);
+
+            //await distributedCache.SetStringAsync("User", System.Text.Json.JsonSerializer.Serialize(user));
 
             return Ok(user);
         }
@@ -32,6 +42,8 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public async Task<IActionResult> GetByUserName(string userName)
         {
             var user = await mediator.Send(new GetUserDetailQuery(Guid.Empty, userName));
+
+            var data = await redisCacheService.GetByIdAsync(user.Id, default);
 
             return Ok(user);
         }
