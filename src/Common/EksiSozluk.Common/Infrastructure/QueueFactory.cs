@@ -35,7 +35,6 @@ namespace EksiSozluk.Common.Infrastructure
             channel.BasicPublish(exchange: exchangeName, routingKey: queueName, basicProperties: null, body: body);
              */
             #endregion
-
         }
 
         public static EventingBasicConsumer CreateBasicConsumer()
@@ -71,7 +70,7 @@ namespace EksiSozluk.Common.Infrastructure
 
                 Console.WriteLine("Received message: " + message); // Gelen mesajı logla
 
-                var obj = JsonSerializer.Deserialize<T>(message);
+                T obj = JsonSerializer.Deserialize<T>(message);
                 act(obj);
 
                 consumer.Model.BasicAck(ea.DeliveryTag, false);

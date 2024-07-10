@@ -22,9 +22,6 @@ namespace UserService
         }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-           
-
-
             QueueFactory.CreateBasicConsumer()
                            .EnsureExchange(SozlukConstants.UserExchangeName)
                            .EnsureQueue(SozlukConstants.UserEmailChangedQueueName, SozlukConstants.UserExchangeName)
@@ -37,6 +34,19 @@ namespace UserService
                                Console.WriteLine($"Email sent to {user.NewEmailAdress} with link {link}");
                            })
                            .StartingConsuming(SozlukConstants.UserEmailChangedQueueName);
+
+
+            QueueFactory.CreateBasicConsumer()
+               .EnsureExchange(SozlukConstants.UserExchangeName)
+               .EnsureQueue(SozlukConstants.UserPasswordChangedQueueName, SozlukConstants.UserExchangeName)
+               .Receive<UserPasswordChangedEvent>(async (user) =>
+               {
+                   userService.UpdateUserPasswordChanged(user).GetAwaiter().GetResult(); // add Db operation        
+               })
+               .StartingConsuming(SozlukConstants.UserPasswordChangedQueueName);
+
+
+
         }
     }
 }

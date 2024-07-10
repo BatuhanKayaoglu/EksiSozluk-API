@@ -15,6 +15,7 @@ namespace EksiSozluk.Common
 
         public const string UserExchangeName = "UserExchange";
         public const string UserEmailChangedQueueName = "UserEmailChangedQueue";
+        public const string UserPasswordChangedQueueName = "UserPasswordChangedQueue";
 
 
         public const string FavExchangeName = "FavExchange";

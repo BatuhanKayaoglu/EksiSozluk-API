@@ -36,5 +36,17 @@ namespace UserService.Services
 
             return guid;
         }
+
+        public async Task UpdateUserPasswordChanged(UserPasswordChangedEvent @event)
+        {
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.ExecuteAsync("UPDATE [User] SET Password=@Password WHERE Id=@Id ",
+                               new
+                               {
+                                   Id= @event.Id,   
+                                   Password = @event.NewPassword
+                               });
+        }
     }
 }
