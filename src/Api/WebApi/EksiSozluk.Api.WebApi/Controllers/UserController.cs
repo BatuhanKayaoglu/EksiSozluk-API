@@ -18,19 +18,19 @@ namespace EksiSozluk.Api.WebApi.Controllers
 
         private readonly IMediator mediator;
         private readonly IRedisCacheService redisCacheService;
+        private readonly IDistributedCache distributedCache;
 
-        public UserController(IMediator mediator, IRedisCacheService redisCacheService)
+        public UserController(IMediator mediator, IRedisCacheService redisCacheService, IDistributedCache distributedCache)
         {
             this.mediator = mediator;
             this.redisCacheService = redisCacheService;
+            this.distributedCache = distributedCache;
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var user = await mediator.Send(new GetUserDetailQuery(id));
-
-            await redisCacheService.SetAsync(user, default);
 
             //await distributedCache.SetStringAsync("User", System.Text.Json.JsonSerializer.Serialize(user));
 

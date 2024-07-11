@@ -18,11 +18,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureRegistration(builder.Configuration);
 builder.Services.AddApplicationRegistration();
 builder.Services.ConfigureAuth(builder.Configuration);
-//builder.Services.AddStackExchangeRedisCache(options =>
-//{
-//    options.Configuration = "redis-12985.c267.us-east-1-4.ec2.redns.redis-cloud.com:12985";
-//});
 
+
+// Redis Cache CONFIGURATION    
+string? redisConfiguration = builder.Configuration.GetSection("Redis").Value;
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = redisConfiguration;
+});
 
 var app = builder.Build();
 

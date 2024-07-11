@@ -3,12 +3,14 @@ using EksiSozluk.Common.ViewModels.Queries;
 using EksİSozluk.Domain.Models;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Pipelines.Sockets.Unofficial;
 
 namespace EksiSozluk.Api.Application.Cache
 {
@@ -16,64 +18,107 @@ namespace EksiSozluk.Api.Application.Cache
     {
         readonly IConfiguration configuration;
         private readonly IUserRepository userRepository;
-
-        public RedisCacheService(IConfiguration configuration, IUserRepository userRepository)
+        private readonly IDistributedCache distributedCache;
+        private readonly Lazy<ConnectionMultiplexer> redisConn;
+        // ConnectionMultiplexer sınıfı, Redis sunucusuna bağlanmak için kullanılır. IDistributedCache methodlarıyla yapamadıgımız bazı işlemler için bu sınıf üzerinden işlemlerimizi yapıyoruz.    
+        // Lazy<T> sınıfı, bir nesnenin oluşturulması gerektiğinde oluşturulmasını sağlar. Bu nesne oluşturulana kadar bellekte yer kaplamaz.   
+        
+        public RedisCacheService(IConfiguration configuration, IUserRepository userRepository, IDistributedCache distributedCache)
         {
             this.configuration = configuration;
             this.userRepository = userRepository;
+            this.distributedCache = distributedCache;
+
+            var redisConnectionString = configuration.GetSection("Redis").Value;
+            redisConn = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(redisConnectionString));
         }
+
+        private ConnectionMultiplexer Connection => redisConn.Value;
 
         public async Task<User> GetByIdAsync(Guid key, CancellationToken cancellationToken)
         {
-            //var HOST_NAME = "redis-12985.c267.us-east-1-4.ec2.redns.redis-cloud.com";
-            //var PORT_NUMBER = "12985";
-            //var PASSWORD = "DrVMZPwGC1NJElCt5czA66czyEDCZUh4";
-            IConfigurationSection info =configuration.GetSection("Redis"); 
-            ConnectionMultiplexer _redis = ConnectionMultiplexer.Connect(info.ToString());
-
-            IDatabase db = _redis.GetDatabase();
-            var user = await db.StringGetAsync(key.ToString());
-
-            if (!user.IsNullOrEmpty)
+            var keyData = $"user:{key}";
+            var user = await distributedCache.GetStringAsync(keyData);
+            // Get the data from Redis  
+            if (user != null)
             {
-                // Deserialize the data to the User object (assuming JSON serialization)
-                var userData = JsonSerializer.Deserialize<User>(user);
+                User? userData = JsonSerializer.Deserialize<User>(user);
                 return userData;
             }
-
             return null;
         }
-        public Task DeleteAsync(Guid key, CancellationToken cancellationToken)
+
+        public async Task DeleteAsync(Guid key, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+
+            bool control = await UserExistsAsync(key, cancellationToken);
+            if (!control)
+                throw new Exception("User not found in cache!");
+
+            var keyData = $"{key.GetType().ToString()}:{key}";
+            distributedCache.Remove(keyData);
+            await Task.CompletedTask;
         }
 
-        public Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
+            // IDistributedCache içersinde Key bilgisine göre tüm verileri getirme işlemi yapılamadığı için alttaki db bağlantısı ile tüm verileri getirme işlemi yapılmıştır.      
+            IDatabase db = Connection.GetDatabase();
+            var server = Connection.GetServer(Connection.GetEndPoints().First());
 
+            RedisKey[] keys = server.Keys(pattern: "user:*").ToArray();
+            List<User> users = new List<User>();
 
-
-        public async Task SetAsync(UserDetailViewModel user, CancellationToken cancellationToken)
-        {
-            var Control = await GetByIdAsync(user.Id, cancellationToken);
-            if (Control != null)
+            foreach (RedisKey keyData in keys)
             {
-                Console.WriteLine("veri sistemde kayıtlı");
+                HashEntry[] hashEntries = await db.HashGetAllAsync(keyData);
+
+                RedisValue userData = hashEntries[1].Value;
+                var serializedUser = JsonSerializer.Deserialize<User>(userData);
+
+                if (hashEntries.Length > 0)
+                {
+                    users.Add(serializedUser);
+                }
             }
 
-            var HOST_NAME = "redis-12985.c267.us-east-1-4.ec2.redns.redis-cloud.com";
-            var PORT_NUMBER = "12985";
-            var PASSWORD = "DrVMZPwGC1NJElCt5czA66czyEDCZUh4";
-            ConnectionMultiplexer _redis = ConnectionMultiplexer.Connect($"{HOST_NAME}:{PORT_NUMBER},password={PASSWORD}");
-            IDatabase db = _redis.GetDatabase();
-            await db.StringSetAsync(user.Id.ToString(), JsonSerializer.Serialize(user));
+            return users;
         }
 
-        public Task UpdatedAsync(User user, CancellationToken cancellationToken)
+
+
+        public async Task SetAsync(User user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            bool control = await UserExistsAsync(user.Id, cancellationToken);
+            if (control)
+                throw new Exception("User found in cache!");
+
+            //await GetAllAsync(cancellationToken);
+
+            var key = $"user:{user.Id}";
+            await distributedCache.SetStringAsync(key, System.Text.Json.JsonSerializer.Serialize(user));
+        }
+
+        public async Task UpdatedAsync(User user, CancellationToken cancellationToken)
+        {
+            var control = await UserExistsAsync(user.Id, cancellationToken);
+            if (control)
+                throw new Exception("User not found in cache!");
+
+            var key = $"user:{user.Id}";
+            distributedCache.Remove(key);
+
+            distributedCache.SetString(key, JsonSerializer.Serialize(user));
+            await Task.CompletedTask;
+        }
+
+        public async Task<bool> UserExistsAsync(Guid key, CancellationToken cancellationToken)
+        {
+            var keyData = $"user:{key}";
+            var user = await distributedCache.GetStringAsync(keyData.ToString());
+            if (user == null)
+                return false;
+            return true;
         }
     }
 }
