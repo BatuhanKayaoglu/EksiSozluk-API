@@ -18,7 +18,8 @@ For database operations, I have used both Dapper and Entity Framework.
 Dapper:When communicating with RabbitMQ, it was used within the Worker Service for faster performance. Dapper is a lightweight and fast ORM (Object-Relational Mapper) for .NET applications. It executes SQL queries directly, providing performance advantages and performing database operations quickly.
 
 
-## Caching
+# Caching
+### Redis
 Redis is a high-performance, in-memory data structure store. In my project, infrequently changing user data is cached in Redis to prevent unnecessary database queries and improve performance. This ensures fast access to user information.
 
 # CQRS, UoW and Repository Design Pattern
