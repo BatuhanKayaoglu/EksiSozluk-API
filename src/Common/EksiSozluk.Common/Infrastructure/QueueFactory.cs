@@ -68,7 +68,7 @@ namespace EksiSozluk.Common.Infrastructure
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
-                Console.WriteLine("Received message: " + message); // Gelen mesajı logla
+                Console.WriteLine("Received message: " + message); 
 
                 T obj = JsonSerializer.Deserialize<T>(message);
                 act(obj);
@@ -78,8 +78,6 @@ namespace EksiSozluk.Common.Infrastructure
 
             return consumer;
         }
-
-
 
         /// <summary>
         // Bu metod, belirtilen kuyruktan mesajların alınmasını başlatır.

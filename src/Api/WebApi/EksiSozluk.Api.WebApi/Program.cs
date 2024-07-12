@@ -2,6 +2,7 @@ using EksiSozluk.Infrastructure.Persistance.Extensions;
 using EksiSozluk.Api.Application.Extensions;
 using FluentValidation.AspNetCore;
 using EksiSozluk.Api.WebApi.Infrastructure.Extensions;
+using EksiSozluk.Common.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers()
     .AddFluentValidation(); // paketi yüklemeyi unutma.
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

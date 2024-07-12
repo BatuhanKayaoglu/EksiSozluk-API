@@ -16,14 +16,12 @@ namespace UserService.Services
         {
             this.configuration = configuration;     
         }
-
         public string GenerateConfirmationLink(Guid confirmationId)
         {
             var baseUrl = configuration["BaseUrl"];
             var url = $"{baseUrl}{confirmationId}";      
             return url; 
         }     
-
         public Task SendEmailAsync(string email, string subject, string message)
         {
             string? mail = configuration["Email:From"];

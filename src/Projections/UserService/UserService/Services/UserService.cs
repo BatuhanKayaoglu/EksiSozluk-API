@@ -23,7 +23,6 @@ namespace UserService.Services
         public async Task<Guid> CreateEmailConfirmation(UserEmailChangedEvent @event)
         {
             var guid = Guid.NewGuid();
-
             using var connection = new SqlConnection(connectionString);
 
             await connection.ExecuteAsync("INSERT INTO EmailConfirmation (Id,CreateDate,OldEmailAdress,NewEmailAdress) VALUES(@Id, GETDATE(),@OldEmailAdress, @NewEmailAdress)",
@@ -33,7 +32,6 @@ namespace UserService.Services
                                    OldEmailAdress = @event.OldEmailAdress,
                                    NewEmailAdress = @event.NewEmailAdress
                                });
-
             return guid;
         }
 

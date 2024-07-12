@@ -8,8 +8,6 @@ using EksiSozluk.Common.ViewModels.RequestModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using StackExchange.Redis;
-using System.Text;
 
 namespace EksiSozluk.Api.WebApi.Controllers
 {
@@ -35,7 +33,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
         {
             List<GetAllUserViewModel> users = await mediator.Send(new GetAllUserQuery());
             return Ok(users);
-        }   
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
@@ -49,9 +47,6 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public async Task<IActionResult> GetByUserName(string userName)
         {
             var user = await mediator.Send(new GetUserDetailQuery(Guid.Empty, userName));
-
-            var data = await redisCacheService.GetByIdAsync(user.Id, default);
-
             return Ok(user);
         }
 
@@ -60,7 +55,6 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public async Task<IActionResult> Login([FromBody] LoginUserCommand command)
         {
             var res = await mediator.Send(command);
-
             return Ok(res);
         }
 
@@ -68,7 +62,6 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public async Task<IActionResult> Create([FromBody] CreateUserCommand command)
         {
             var res = await mediator.Send(command);
-
             return Ok(res);
         }
 
@@ -78,7 +71,6 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public async Task<IActionResult> UpdateUser([FromBody] UpdateUserCommand command)
         {
             var res = await mediator.Send(command);
-
             return Ok(res);
         }
 
@@ -87,7 +79,6 @@ namespace EksiSozluk.Api.WebApi.Controllers
         public async Task<IActionResult> Confirm(Guid id)
         {
             var res = await mediator.Send(new ConfirmEmailCommand() { ConfirmationId = id });
-
             return Ok(res);
         }
 

@@ -13,7 +13,6 @@ namespace EksiSozluk.Api.WebApi.Controllers
     public class VoteController : BaseController
     {
         private readonly IMediator mediator;
-
         public VoteController(IMediator mediator)
         {
             this.mediator = mediator;

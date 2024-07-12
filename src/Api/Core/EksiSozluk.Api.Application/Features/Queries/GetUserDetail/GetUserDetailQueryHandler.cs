@@ -27,10 +27,7 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetUserDetail
 
         public async Task<UserDetailViewModel> Handle(GetUserDetailQuery request, CancellationToken cancellationToken)
         {
-            //User? data = await redisCacheService.GetByIdAsync(request.UserId, default);
-
-            var data = await userRepository.GetByIdAsync(request.UserId);   
-            //await redisCacheService.SetAsync(data, default);        
+            var data = await userRepository.GetByIdAsync(request.UserId);
 
             if (data != null)
                 return mapper.Map<UserDetailViewModel>(data);
@@ -49,7 +46,6 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetUserDetail
                 dbUser = await userRepository.GetSingleAsync(i => i.Username == request.UserName);
                 await redisCacheService.SetAsync(dbUser, default);
             }
-
             return mapper.Map<UserDetailViewModel>(dbUser);
         }
     }
