@@ -19,7 +19,6 @@ Dapper:When communicating with RabbitMQ, it was used within the Worker Service f
 
 
 ## Caching
-# Redis
 Redis is a high-performance, in-memory data structure store. In my project, infrequently changing user data is cached in Redis to prevent unnecessary database queries and improve performance. This ensures fast access to user information.
 
 # CQRS, UoW and Repository Design Pattern
