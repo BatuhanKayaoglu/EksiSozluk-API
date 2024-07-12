@@ -1,7 +1,9 @@
 ﻿using EksiSozluk.Api.Application.Cache;
 using EksiSozluk.Api.Application.Features.Commands.User.ConfirmEmail;
+using EksiSozluk.Api.Application.Features.Queries.GetAllUser;
 using EksiSozluk.Api.Application.Features.Queries.GetUserDetail;
 using EksiSozluk.Common.Events.User;
+using EksiSozluk.Common.ViewModels.Queries;
 using EksiSozluk.Common.ViewModels.RequestModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -27,13 +29,18 @@ namespace EksiSozluk.Api.WebApi.Controllers
             this.distributedCache = distributedCache;
         }
 
+        [HttpGet]
+        [Route("GetAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            List<GetAllUserViewModel> users = await mediator.Send(new GetAllUserQuery());
+            return Ok(users);
+        }   
+
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
             var user = await mediator.Send(new GetUserDetailQuery(id));
-
-            //await distributedCache.SetStringAsync("User", System.Text.Json.JsonSerializer.Serialize(user));
-
             return Ok(user);
         }
 

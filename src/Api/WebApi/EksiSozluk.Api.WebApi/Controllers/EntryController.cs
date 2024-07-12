@@ -69,7 +69,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
 
         [HttpPost]
         [Route("CreateEntry")]
-        public async Task<IActionResult> CreateEntry([FromBody] CreateEntryCommand command)
+        public async Task<IActionResult> CreateEntry( CreateEntryCommand command)
         {
             if (command.CreatedById is null) // eğer ki dışarıdan bu id'yi göndermedikleri bir senaryo olursa jwtToken'dan gelen UserId bilgisi CreatedById bilgisine atansın.
                 command.CreatedById = UserId;

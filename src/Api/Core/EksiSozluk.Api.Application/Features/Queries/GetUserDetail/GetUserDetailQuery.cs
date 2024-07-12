@@ -2,9 +2,6 @@
 using MediatR;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EksiSozluk.Api.Application.Features.Queries.GetUserDetail
 {
@@ -18,8 +15,5 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetUserDetail
             UserId = userId;
             UserName = userName;
         }
-
-
-
     }
 }

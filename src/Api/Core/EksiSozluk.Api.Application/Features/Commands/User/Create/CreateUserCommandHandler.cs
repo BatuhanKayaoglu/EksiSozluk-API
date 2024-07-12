@@ -13,6 +13,7 @@ using EksİSozluk.Domain.Models;
 using EksiSozluk.Common.Infrastructure;
 using EksiSozluk.Common.Events.User;
 using EksiSozluk.Common;
+using EksiSozluk.Api.Application.Cache;
 
 namespace EksiSozluk.Api.Application.Features.Commands.User.Create
 {
@@ -20,11 +21,13 @@ namespace EksiSozluk.Api.Application.Features.Commands.User.Create
     {
         private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
+        private readonly IRedisCacheService redisCacheService;
 
-        public CreateUserCommandHandler(IUserRepository userRepository, IMapper mapper)
+        public CreateUserCommandHandler(IUserRepository userRepository, IMapper mapper, IRedisCacheService redisCacheService)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
+            this.redisCacheService = redisCacheService;
         }
 
         public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -38,6 +41,8 @@ namespace EksiSozluk.Api.Application.Features.Commands.User.Create
 
             var rows = await userRepository.AddAsync(dbUser);
 
+            await redisCacheService.SetAsync(dbUser, default);  // add redisCache 
+
             // Email changed/created
             if (rows > 0)
             {
@@ -47,7 +52,8 @@ namespace EksiSozluk.Api.Application.Features.Commands.User.Create
                     NewEmailAdress = dbUser.EmailAddress
                 };
 
-                QueueFactory.SendMessageToExchange(exchangeName:SozlukConstants.UserExchangeName,exchangeType:SozlukConstants.DefaultExchangeType,queueName:SozlukConstants.UserEmailChangedQueueName,obj:@event);
+                // send message to RabbitMQ for email changed/created   
+                QueueFactory.SendMessageToExchange(exchangeName: SozlukConstants.UserExchangeName, exchangeType: SozlukConstants.DefaultExchangeType, queueName: SozlukConstants.UserEmailChangedQueueName, obj: @event);
             }
 
             return dbUser.Id;

@@ -22,7 +22,7 @@ namespace EksiSozluk.Api.Application.Cache
         private readonly Lazy<ConnectionMultiplexer> redisConn;
         // ConnectionMultiplexer sınıfı, Redis sunucusuna bağlanmak için kullanılır. IDistributedCache methodlarıyla yapamadıgımız bazı işlemler için bu sınıf üzerinden işlemlerimizi yapıyoruz.    
         // Lazy<T> sınıfı, bir nesnenin oluşturulması gerektiğinde oluşturulmasını sağlar. Bu nesne oluşturulana kadar bellekte yer kaplamaz.   
-        
+
         public RedisCacheService(IConfiguration configuration, IUserRepository userRepository, IDistributedCache distributedCache)
         {
             this.configuration = configuration;
@@ -32,7 +32,6 @@ namespace EksiSozluk.Api.Application.Cache
             var redisConnectionString = configuration.GetSection("Redis").Value;
             redisConn = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(redisConnectionString));
         }
-
         private ConnectionMultiplexer Connection => redisConn.Value;
 
         public async Task<User> GetByIdAsync(Guid key, CancellationToken cancellationToken)
@@ -40,7 +39,7 @@ namespace EksiSozluk.Api.Application.Cache
             var keyData = $"user:{key}";
             var user = await distributedCache.GetStringAsync(keyData);
             // Get the data from Redis  
-            if (user != null)
+            if (user is not null)
             {
                 User? userData = JsonSerializer.Deserialize<User>(user);
                 return userData;
@@ -50,7 +49,6 @@ namespace EksiSozluk.Api.Application.Cache
 
         public async Task DeleteAsync(Guid key, CancellationToken cancellationToken)
         {
-
             bool control = await UserExistsAsync(key, cancellationToken);
             if (!control)
                 throw new Exception("User not found in cache!");
@@ -62,11 +60,11 @@ namespace EksiSozluk.Api.Application.Cache
 
         public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
         {
-            // IDistributedCache içersinde Key bilgisine göre tüm verileri getirme işlemi yapılamadığı için alttaki db bağlantısı ile tüm verileri getirme işlemi yapılmıştır.      
+            // IDistributedCache interface'i içersinde Key bilgisine göre tüm verileri getirme işlemi yapılamadığı için alttaki db bağlantısı ile tüm verileri getirme işlemi yapılmıştır.      
             IDatabase db = Connection.GetDatabase();
             var server = Connection.GetServer(Connection.GetEndPoints().First());
 
-            RedisKey[] keys = server.Keys(pattern: "user:*").ToArray();
+            RedisKey[] keys = server.Keys(pattern: "user:*").ToArray(); // if have "user" key, you can use pattern: "user:*"  
             List<User> users = new List<User>();
 
             foreach (RedisKey keyData in keys)
@@ -77,20 +75,17 @@ namespace EksiSozluk.Api.Application.Cache
                 var serializedUser = JsonSerializer.Deserialize<User>(userData);
 
                 if (hashEntries.Length > 0)
-                {
                     users.Add(serializedUser);
-                }
             }
 
             return users;
         }
 
 
-
         public async Task SetAsync(User user, CancellationToken cancellationToken)
         {
             bool control = await UserExistsAsync(user.Id, cancellationToken);
-            if (control)
+                if (control)
                 throw new Exception("User found in cache!");
 
             //await GetAllAsync(cancellationToken);

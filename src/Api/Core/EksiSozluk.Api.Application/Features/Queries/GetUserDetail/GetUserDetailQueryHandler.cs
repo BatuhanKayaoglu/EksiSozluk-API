@@ -30,7 +30,7 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetUserDetail
             //User? data = await redisCacheService.GetByIdAsync(request.UserId, default);
 
             var data = await userRepository.GetByIdAsync(request.UserId);   
-            await redisCacheService.SetAsync(data, default);        
+            //await redisCacheService.SetAsync(data, default);        
 
             if (data != null)
                 return mapper.Map<UserDetailViewModel>(data);
