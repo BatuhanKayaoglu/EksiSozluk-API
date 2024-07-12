@@ -11,6 +11,10 @@ Onion Architecture is an architectural pattern that aims to separate the core bu
 RabbitMQ and Worker Services
 RabbitMQ is a powerful message queue system that allows messages to be queued and processed asynchronously. In my project, 'users' operations such as 'entryVote', 'EntryFavorite', 'CommentFavorite', 'Email' and 'Password' changes are sent to the RabbitMQ queue and processed by Worker Services like FavoriteService, UserService, and VoteService. This ensures that operations are performed quickly and efficiently.
 
+
+![rabbitmq](https://github.com/user-attachments/assets/7d37cfc5-d2ef-49a0-affe-c3bc919b1808)
+
+
 # Database Operations
 ### Dapper and Entity Framework
 For database operations, I have used both Dapper and Entity Framework.
