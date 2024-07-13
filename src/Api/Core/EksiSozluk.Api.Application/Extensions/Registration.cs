@@ -21,7 +21,8 @@ namespace EksiSozluk.Api.Application.Extensions
             services.AddMediatR(asm);
             services.AddAutoMapper(asm);    
             services.AddValidatorsFromAssembly(asm);  
-            services.AddTransient<IRedisCacheService,RedisCacheService>();  
+            services.AddTransient<IRedisCacheService,RedisCacheService>();
+            services.AddTransient(typeof(IGenericRedisService<>), typeof(GenericRedisService<>));
 
             return services;    
         }

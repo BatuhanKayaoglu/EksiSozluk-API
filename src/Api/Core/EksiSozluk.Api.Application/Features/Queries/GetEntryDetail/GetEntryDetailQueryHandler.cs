@@ -1,9 +1,12 @@
-﻿using EksiSozluk.Api.Application.Features.Queries.GetEntryComments;
+﻿using AutoMapper;
+using EksiSozluk.Api.Application.Cache;
+using EksiSozluk.Api.Application.Features.Queries.GetEntryComments;
 using EksiSozluk.Api.Application.Repositories;
 using EksiSozluk.Common.Infrastructure.Extensions;
 using EksiSozluk.Common.Models.Page;
 using EksiSozluk.Common.ViewModels;
 using EksiSozluk.Common.ViewModels.Queries;
+using EksİSozluk.Domain.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -17,10 +20,14 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetEntryDetail
     public class GetEntryDetailQueryHandler : IRequestHandler<GetEntryDetailQuery, GetEntryDetailViewModel>
     {
         private readonly IEntryRepository entryRepository;
+        private readonly IGenericRedisService<Entry> genericRedisService;
+        private readonly IMapper mapper;
 
-        public GetEntryDetailQueryHandler(IEntryRepository entryRepository)
+        public GetEntryDetailQueryHandler(IEntryRepository entryRepository, IGenericRedisService<Entry> genericRedisService, IMapper mapper)
         {
             this.entryRepository = entryRepository;
+            this.genericRedisService = genericRedisService;
+            this.mapper = mapper;
         }
 
         public async Task<GetEntryDetailViewModel> Handle(GetEntryDetailQuery request, CancellationToken cancellationToken)
@@ -41,6 +48,9 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetEntryDetail
                 CreatedByUserName = i.CreatedBy.Username,
                 VoteType = request.UserId.HasValue && i.EntryVotes.Any(j => j.CreatedById == request.UserId) ? i.EntryVotes.FirstOrDefault(j => j.CreatedById == request.UserId).VoteType : VoteType.None
             });
+
+           
+
 
             return await list.FirstOrDefaultAsync(cancellationToken:cancellationToken);
         }

@@ -17,17 +17,20 @@ namespace EksiSozluk.Api.Application.Features.Queries.GetUserDetail
         private readonly IUserRepository userRepository;
         private readonly IMapper mapper;
         private readonly IRedisCacheService redisCacheService;
-
-        public GetUserDetailQueryHandler(IUserRepository userRepository, IMapper mapper, IRedisCacheService redisCacheService)
+        private readonly IGenericRedisService<User> genericRedisService;
+        public GetUserDetailQueryHandler(IUserRepository userRepository, IMapper mapper, IRedisCacheService redisCacheService, IGenericRedisService<User> genericRedisService)
         {
             this.userRepository = userRepository;
             this.mapper = mapper;
             this.redisCacheService = redisCacheService;
+            this.genericRedisService = genericRedisService;
         }
 
         public async Task<UserDetailViewModel> Handle(GetUserDetailQuery request, CancellationToken cancellationToken)
         {
             var data = await userRepository.GetByIdAsync(request.UserId);
+
+            await genericRedisService.GetByIdAsync(data.Id, default);
 
             if (data != null)
                 return mapper.Map<UserDetailViewModel>(data);
