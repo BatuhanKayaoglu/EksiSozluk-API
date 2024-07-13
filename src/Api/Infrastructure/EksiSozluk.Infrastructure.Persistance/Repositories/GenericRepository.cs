@@ -31,7 +31,7 @@ namespace EksiSozluk.Infrastructure.Persistance.Repositories
             return dbContext.SaveChanges();
         }
 
-        public virtual int Add(IEnumerable<TEntity> entities) 
+        public virtual int Add(IEnumerable<TEntity> entities)
         {
             if (entities != null && !entities.Any())
                 return 0;
@@ -252,7 +252,7 @@ namespace EksiSozluk.Infrastructure.Persistance.Repositories
             return await query.ToListAsync();
         }
 
-        public virtual async Task<TEntity> GetByIdAsync(Guid id, bool noTracking = true, params Expression<Func<TEntity, object>>[] includes)
+        public virtual async Task<TEntity> GetByIdAsync(Guid id, bool noTracking = true, bool loadRelated = false, params Expression<Func<TEntity, object>>[] includes)
         {
             TEntity found = await entity.FindAsync(id);
 
@@ -262,9 +262,12 @@ namespace EksiSozluk.Infrastructure.Persistance.Repositories
             if (noTracking)
                 dbContext.Entry(found).State = EntityState.Detached;
 
-            foreach (Expression<Func<TEntity, object>> include in includes)
+            if (loadRelated)
             {
-                dbContext.Entry(found).Reference(include).Load();
+                foreach (Expression<Func<TEntity, object>> include in includes)
+                {
+                    dbContext.Entry(found).Reference(include).Load();
+                }
             }
 
             return found;

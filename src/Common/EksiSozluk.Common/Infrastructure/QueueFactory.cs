@@ -80,8 +80,6 @@ namespace EksiSozluk.Common.Infrastructure
             return consumer;
         }
 
-
-
         /// <summary>
         // Bu metod, belirtilen kuyruktan mesajların alınmasını başlatır.
         // consumer.Model.BasicConsume kullanılarak belirtilen kuyruktan mesajlar alınmaya başlanır.
