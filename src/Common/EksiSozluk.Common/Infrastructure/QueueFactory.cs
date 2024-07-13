@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.Extensions.Configuration;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace EksiSozluk.Common.Infrastructure
         public static EventingBasicConsumer CreateBasicConsumer()
         {
             var factory = new ConnectionFactory();
-            factory.Uri = new("amqps://xvnbchgs:Xqd-yU1RoCvt3stDRk0cPyXzXIiqxJJT@moose.rmq.cloudamqp.com/xvnbchgs");
+            factory.Uri = new(SozlukConstants.RabbitMQHost);
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
 
@@ -68,7 +69,7 @@ namespace EksiSozluk.Common.Infrastructure
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
-                Console.WriteLine("Received message: " + message); // Gelen mesajı logla
+                Console.WriteLine("Received message: " + message);
 
                 T obj = JsonSerializer.Deserialize<T>(message);
                 act(obj);
