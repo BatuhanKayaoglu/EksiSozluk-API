@@ -34,3 +34,10 @@ Unit of Work is a design pattern that keeps database operations together, ensuri
 
 ### Repository Design Pattern
 The Repository Design Pattern abstracts database operations, making the data access layer more manageable and testable. This pattern decouples database operations from other layers of the application.
+
+## Installation and Usage
+
+To clone the project to your local environment:
+
+```bash
+git clone https://github.com/BatuhanKayaoglu/EksiSozluk-API.git
