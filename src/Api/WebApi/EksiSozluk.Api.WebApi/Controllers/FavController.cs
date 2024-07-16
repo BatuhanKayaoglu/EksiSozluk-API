@@ -36,7 +36,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
         }
 
 
-        [HttpPost]
+        [HttpDelete]
         [Route("DeleteEntryFav/{enmtryId}")]
         public async Task<IActionResult> DeleteEntryFav(Guid entryId)
         {
@@ -44,7 +44,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route("DeleteEntryCommentFav/{entryCommentId}")]
         public async Task<IActionResult> DeleteEntryCommentFav(Guid entryCommentId)
         {

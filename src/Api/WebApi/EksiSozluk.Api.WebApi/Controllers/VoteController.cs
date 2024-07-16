@@ -38,7 +38,7 @@ namespace EksiSozluk.Api.WebApi.Controllers
         }
 
 
-        [HttpPost]
+        [HttpDelete]
         [Route("DeleteEntryVote/{entryId}")]
         public async Task<IActionResult> DeleteEntryVote(Guid entryId)
         {
