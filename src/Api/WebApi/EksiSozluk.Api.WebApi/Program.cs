@@ -3,15 +3,11 @@ using EksiSozluk.Api.Application.Extensions;
 using FluentValidation.AspNetCore;
 using EksiSozluk.Api.WebApi.Infrastructure.Extensions;
 using EksiSozluk.Common.Infrastructure;
+using EksiSozluk.Api.WebApi.Middlewares.Filter.Validation;
+using EksiSozluk.Api.WebApi.Middlewares.Filter.GlobalExceptionHandler;
+using EksiSozluk.Api.WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
-
-// Add services to the container.
-
-builder.Services.AddControllers()
-    .AddFluentValidation(); // paketi yüklemeyi unutma.
-
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -20,14 +16,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureRegistration(builder.Configuration);
 builder.Services.AddApplicationRegistration();
 builder.Services.ConfigureAuth(builder.Configuration);
+builder.Services.AddWebApiRegistration(builder.Configuration);
 
-
-// Redis Cache CONFIGURATION    
-string? redisConfiguration = builder.Configuration.GetSection("Redis").Value;
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.Configuration = redisConfiguration;
-});
 
 var app = builder.Build();
 
@@ -40,6 +30,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.ConfigureExceptionHandlingMiddleware();
 app.ConfigureExceptionHandling(app.Environment.IsDevelopment());
 
 app.UseAuthentication();
