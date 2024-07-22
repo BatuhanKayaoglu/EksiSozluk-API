@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Distributed;
+﻿using EksİSozluk.Domain.Models;
+using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 using System;
@@ -6,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace EksiSozluk.Api.Application.Cache
@@ -24,20 +26,22 @@ namespace EksiSozluk.Api.Application.Cache
             var redisConnectionString = configuration.GetSection("Redis").Value;
             redisConn = new Lazy<ConnectionMultiplexer>(() => ConnectionMultiplexer.Connect(redisConnectionString));
         }
-
         private ConnectionMultiplexer Connection => redisConn.Value;
+
+
+        private static RedisKey UserKeyPrefix = Encoding.UTF8.GetBytes($"{typeof(T).Name.ToLower()}:");
+        private static RedisKey GetKey(string key) => UserKeyPrefix.Append(key);
 
         public async Task<T> GetByIdAsync(Guid key, CancellationToken cancellationToken)
         {
-            var keyData = $"{typeof(T).Name.ToLower()}:{key}";
-            var data = await distributedCache.GetStringAsync(keyData);
+            var data = await distributedCache.GetStringAsync(GetKey(key.ToString()));
 
             if (data is not null)
             {
                 T? entity = JsonSerializer.Deserialize<T>(data);
-                return entity;
+                if (entity is not null)
+                    return entity;
             }
-                
             return null;
         }
 
@@ -47,8 +51,7 @@ namespace EksiSozluk.Api.Application.Cache
             if (!control)
                 throw new Exception($"{typeof(T).Name} not found in cache!");
 
-            var keyData = $"{typeof(T).Name.ToLower()}:{key}";
-            await distributedCache.RemoveAsync(keyData);
+            await distributedCache.RemoveAsync(GetKey(key.ToString()));
         }
 
         public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
@@ -78,9 +81,8 @@ namespace EksiSozluk.Api.Application.Cache
             if (control)
                 throw new Exception($"{typeof(T).Name} found in cache!");
 
-            var keyData = $"{typeof(T).Name.ToLower()}:{key}";
             var serializedData = JsonSerializer.Serialize(entity);
-            await distributedCache.SetStringAsync(keyData, serializedData);
+            await distributedCache.SetStringAsync(GetKey(key.ToString()), serializedData);
         }
 
         public async Task UpdateAsync(T entity, Guid key, CancellationToken cancellationToken)
@@ -89,17 +91,15 @@ namespace EksiSozluk.Api.Application.Cache
             if (!control)
                 throw new Exception($"{typeof(T).Name} not found in cache!");
 
-            var keyData = $"{typeof(T).Name.ToLower()}:{key}";
-            await distributedCache.RemoveAsync(keyData);
+            await distributedCache.RemoveAsync(GetKey(key.ToString()));
 
             var serializedData = JsonSerializer.Serialize(entity);
-            await distributedCache.SetStringAsync(keyData, serializedData);
+            await distributedCache.SetStringAsync(GetKey(key.ToString()), serializedData);
         }
 
         public async Task<bool> EntityExistsAsync(Guid key, CancellationToken cancellationToken)
         {
-            var keyData = $"{typeof(T).Name.ToLower()}:{key}";
-            var data = await distributedCache.GetStringAsync(keyData);
+            string? data = await distributedCache.GetStringAsync(GetKey(key.ToString()));
             return data != null;
         }
     }

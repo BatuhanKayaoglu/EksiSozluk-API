@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Pipelines.Sockets.Unofficial;
+using System.Text.Json.Serialization;
 
 namespace EksiSozluk.Api.Application.Cache
 {
@@ -34,14 +35,19 @@ namespace EksiSozluk.Api.Application.Cache
         }
         private ConnectionMultiplexer Connection => redisConn.Value;
 
+        private static RedisKey UserKeyPrefix = Encoding.UTF8.GetBytes("user:");
+        private static RedisKey GetUserKey(string userId) => UserKeyPrefix.Append(userId);
+
         public async Task<User> GetByIdAsync(Guid key, CancellationToken cancellationToken)
         {
-            var keyData = $"user:{key}";
-            var user = await distributedCache.GetStringAsync(keyData);
+            var user = await distributedCache.GetStringAsync(GetUserKey(key.ToString()));
+            //var keyData = $"user:{key}";
+            //var user = await distributedCache.GetStringAsync(keyData);
+
             // Get the data from Redis  
             if (user is not null)
             {
-                User? userData = JsonSerializer.Deserialize<User>(user);
+                User? userData = JsonSerializer.Deserialize(user, UserSerializationContext.Default.User);
                 return userData;
             }
             return null;
@@ -85,13 +91,13 @@ namespace EksiSozluk.Api.Application.Cache
         public async Task SetAsync(User user, CancellationToken cancellationToken)
         {
             bool control = await UserExistsAsync(user.Id, cancellationToken);
-                if (control)
+            if (control)
                 throw new Exception("User found in cache!");
 
             //await GetAllAsync(cancellationToken);
 
             var key = $"user:{user.Id}";
-            await distributedCache.SetStringAsync(key, System.Text.Json.JsonSerializer.Serialize(user));
+            await distributedCache.SetStringAsync(key, JsonSerializer.Serialize(user));
         }
 
         public async Task UpdatedAsync(User user, CancellationToken cancellationToken)
@@ -100,7 +106,7 @@ namespace EksiSozluk.Api.Application.Cache
             if (control)
                 throw new Exception("User not found in cache!");
 
-            var key = $"user:{user.Id}";
+            var key = GetUserKey(user.Id.ToString());
             distributedCache.Remove(key);
 
             distributedCache.SetString(key, JsonSerializer.Serialize(user));
@@ -109,11 +115,16 @@ namespace EksiSozluk.Api.Application.Cache
 
         public async Task<bool> UserExistsAsync(Guid key, CancellationToken cancellationToken)
         {
-            var keyData = $"user:{key}";
-            var user = await distributedCache.GetStringAsync(keyData.ToString());
+            var user = await distributedCache.GetStringAsync(GetUserKey(key.ToString()));
             if (user == null)
                 return false;
             return true;
         }
     }
+}
+
+[JsonSerializable(typeof(User))]
+[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
+public partial class UserSerializationContext : JsonSerializerContext
+{
 }

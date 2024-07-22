@@ -26,7 +26,7 @@ namespace EksiSozluk.Infrastructure.Persistance.Context
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var connStr = "Server=BATUHAN\\SQLEXPRESS;Initial Catalog=EksiSozluk;MultipleActiveResultSets=True;Integrated Security=True;";
+                var connStr = "Server=BATUHAN\\SQLEXPRESS;Initial Catalog=EksiSozluk;MultipleActiveResultSets=True;Integrated Security=True;TrustServerCertificate=True;";
 
                 optionsBuilder.UseSqlServer(connStr);
 
