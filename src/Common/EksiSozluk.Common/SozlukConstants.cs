@@ -9,6 +9,7 @@ namespace EksiSozluk.Common
     public class SozlukConstants
     {
         public const string RabbitMQHost = "amqps://xvnbchgs:Xqd-yU1RoCvt3stDRk0cPyXzXIiqxJJT@moose.rmq.cloudamqp.com/xvnbchgs";
+        //public const string RabbitMQHost = "amqp://guest:guest@localhost:5672/";
         public const string RabbitMQHostUri = "localhost";
         public const string DefaultExchangeType = "direct";
 
